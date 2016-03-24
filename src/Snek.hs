@@ -1,11 +1,28 @@
+module Snek
+( Point(..)
+, Direction(..)
+, MapSize(..)
+, Snake(..)
+, GameMap(..)
+, SnakeBit
+, Food
+, addSnakeBit
+, turnSnake
+, moveSnake
+, pointsOverlap
+, snakeAteSelf
+, createMap
+, displayMap
+) where
+
 data Point = Point Int Int deriving (Eq, Show)
 data Direction = N | E | S | W deriving (Eq, Show)
 data MapSize = MapSize Int Int deriving (Show)
 data Snake = Snake Direction [SnakeBit] deriving (Show)
+data GameMap = GameMap MapSize [MapRow] deriving (Show)
 
 type Cell = String
 type MapRow = [Cell]
-type Map = [MapRow]
 
 type SnakeBit = Point
 type Food = Point
@@ -43,17 +60,20 @@ snakeAteSelf (Snake dir (sHead:sTail)) =
         else (snakeAteSelf (Snake dir sTail))
     where overlap = pointsOverlap sTail sHead
 
-main = do
-    let ms = MapSize 8 8
+createCell :: Int -> Int -> [SnakeBit] -> Food -> Cell
+createCell x y sb fd
+    | (Point x y) == fd            = "F"
+    | pointsOverlap sb (Point x y) = "S"
+    | otherwise                    = "."
 
-    let snek = (Snake E [(Point 3 3)
-                        ,(Point 4 3)
-                        ,(Point 5 3)])
+createMapRow :: Int -> Int -> [SnakeBit] -> Food -> MapRow
+createMapRow xb y sb fd =
+    [ createCell x y sb fd | x <- [0..(xb-1)]]
 
-    let fud = Point 3 5
+createMap :: MapSize -> Snake -> Food -> GameMap
+createMap (MapSize xb yb) (Snake _ sb) fd =
+    (GameMap (MapSize xb yb) [createMapRow xb y sb fd | y <- [0..(yb-1)]])
 
-    let snek1 = (addSnakeBit (moveSnake (turnSnake (moveSnake snek) W)))
-
-    print snek1
-    print (snakeAteSelf (snek1))
-
+displayMap :: GameMap -> String
+displayMap (GameMap (MapSize xb yb) mp) =
+    concat (map (\x -> (concat x) ++ "\n") mp)
