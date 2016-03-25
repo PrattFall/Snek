@@ -1,21 +1,51 @@
 module Main where
 
 import Snek
+import System.IO
 
 main :: IO ()
 main = do
-    let ms = MapSize 8 8
+    let ms = MapSize 16 8
+    let snek = (Snake E [(Point 8 4)])
+    let fud = Point 3 5 -- getRandomNonSnakePoint
 
-    let snek = (Snake E [(Point 3 3)
-                        ,(Point 4 3)
-                        ,(Point 5 3)])
+    gameLoop ms snek fud
 
-    let fud = Point 3 5
+gameLoop :: MapSize -> Snake -> Food -> IO ()
+gameLoop ms sn fd = do
+    inp <- getLine
 
-    let snek1 = (addSnakeBit (moveSnake (turnSnake (moveSnake snek) W)))
-    let gm = (createMap ms snek1 fud)
+    let (Snake sDir sb) = sn
 
-    putStrLn (displayMap gm)
+    let dir = (directionFromInput inp sDir)
 
-    print snek1
-    print (snakeAteSelf (snek1))
+    let turnedSnake = turnSnake sn dir
+
+    let snakeAteFood = (pointsOverlap sb fd)
+
+    let movedSnek = if snakeAteFood
+        then (addSnakeBit turnedSnake)
+        else (moveSnake turnedSnake)
+
+    let newFood = if snakeAteFood
+        then (Point 1 2) -- getRandomNonSnakePoint
+        else fd
+
+    let gm = (createMap ms movedSnek newFood)
+
+    let lostGame = (snakeAteSelf movedSnek)
+
+    if lostGame
+        then (putStrLn "You Lost")
+        else (putStrLn (displayMap gm))
+
+    gameLoop ms movedSnek newFood
+
+-- getRandomNonSnakePoint :: MapSize ->  Snake -> Point
+-- getRandomNonSnakePoint (MapSize xb yb) (Snake d sb)
+--     | pointsOverlap sb pt = getRandomNonSnakePoint (Snake d sb)
+--     | otherwise = pt
+--     where g <- newStdGen
+--           x <- randomR (0, xb) g
+--           y <- randomR (0, yb) g
+--           pt = (Point x y)

@@ -13,6 +13,7 @@ module Snek
 , snakeAteSelf
 , createMap
 , displayMap
+, directionFromInput
 ) where
 
 data Point = Point Int Int deriving (Eq, Show)
@@ -77,3 +78,10 @@ createMap (MapSize xb yb) (Snake _ sb) fd =
 displayMap :: GameMap -> String
 displayMap (GameMap (MapSize xb yb) mp) =
     concat (map (\x -> (concat x) ++ "\n") mp)
+
+directionFromInput :: String -> Direction -> Direction
+directionFromInput "w" _ = N
+directionFromInput "s" _ = S
+directionFromInput "a" _ = W
+directionFromInput "d" _ = E
+directionFromInput _ dir = dir
