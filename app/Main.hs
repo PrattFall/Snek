@@ -1,19 +1,26 @@
 module Main where
 
-import Snek
 import System.IO
+import System.Random
+
+import Snek
 
 main :: IO ()
 main = do
+    gen <- newStdGen
+
     let ms = MapSize 16 8
+
     let snek = (Snake E [(Point 8 4)])
-    let fud = Point 3 5 -- getRandomNonSnakePoint
+
+    let fud = getRandomNonSnakePoint gen ms snek
 
     gameLoop ms snek fud
 
 gameLoop :: MapSize -> Snake -> Food -> IO ()
 gameLoop ms sn fd = do
     inp <- getLine
+    gen <- newStdGen
 
     let (Snake sDir sb) = sn
 
@@ -21,14 +28,14 @@ gameLoop ms sn fd = do
 
     let turnedSnake = turnSnake sn dir
 
-    let snakeAteFood = (pointsOverlap sb fd)
+    let snakeAteFood = (elem fd sb)
 
     let movedSnek = if snakeAteFood
         then (addSnakeBit turnedSnake)
         else (moveSnake turnedSnake)
 
     let newFood = if snakeAteFood
-        then (Point 1 2) -- getRandomNonSnakePoint
+        then getRandomNonSnakePoint gen ms movedSnek
         else fd
 
     let gm = (createMap ms movedSnek newFood)
@@ -36,16 +43,24 @@ gameLoop ms sn fd = do
     let lostGame = (snakeAteSelf movedSnek)
 
     if lostGame
-        then (putStrLn "You Lost")
+        then (lostMode movedSnek)
         else (putStrLn (displayMap gm))
 
     gameLoop ms movedSnek newFood
 
--- getRandomNonSnakePoint :: MapSize ->  Snake -> Point
--- getRandomNonSnakePoint (MapSize xb yb) (Snake d sb)
---     | pointsOverlap sb pt = getRandomNonSnakePoint (Snake d sb)
---     | otherwise = pt
---     where g <- newStdGen
---           x <- randomR (0, xb) g
---           y <- randomR (0, yb) g
---           pt = (Point x y)
+lostMode :: Snake -> IO ()
+lostMode sn = do
+    let numSB = (show (countSnakeBits sn))
+    putStrLn "Snek is Dead."
+    putStrLn ("You ended up with " ++ numSB ++ " points!")
+    putStrLn "Press any key to start over."
+    main
+
+getRandomNonSnakePoint :: StdGen -> MapSize -> Snake -> Point
+getRandomNonSnakePoint g (MapSize xb yb) (Snake dir sb)
+    | elem pt sb =
+        getRandomNonSnakePoint tG (MapSize xb yb) (Snake dir sb)
+    | otherwise = pt
+    where (x, sG) = randomR (0, (xb-1)) g
+          (y, tG) = randomR (0, (yb-1)) sG
+          pt = (Point x y)

@@ -9,11 +9,11 @@ module Snek
 , addSnakeBit
 , turnSnake
 , moveSnake
-, pointsOverlap
 , snakeAteSelf
 , createMap
 , displayMap
 , directionFromInput
+, countSnakeBits
 ) where
 
 data Point = Point Int Int deriving (Eq, Show)
@@ -49,22 +49,18 @@ moveSnake :: Snake -> Snake
 moveSnake (Snake dir sb) =
     Snake dir ((newHead (Snake dir sb)):(init sb))
 
-pointsOverlap :: [Point] -> Point -> Bool
-pointsOverlap pts tgt = foldl (\acc x ->
-    if x == tgt then True else acc) False pts
-
 snakeAteSelf :: Snake -> Bool
 snakeAteSelf (Snake _ []) = False
 snakeAteSelf (Snake dir (sHead:sTail)) =
     if overlap
         then True
         else (snakeAteSelf (Snake dir sTail))
-    where overlap = pointsOverlap sTail sHead
+    where overlap = elem sHead sTail
 
 createCell :: Int -> Int -> [SnakeBit] -> Food -> Cell
 createCell x y sb fd
+    | elem (Point x y) sb = "S"
     | (Point x y) == fd            = "F"
-    | pointsOverlap sb (Point x y) = "S"
     | otherwise                    = "."
 
 createMapRow :: Int -> Int -> [SnakeBit] -> Food -> MapRow
@@ -78,6 +74,9 @@ createMap (MapSize xb yb) (Snake _ sb) fd =
 displayMap :: GameMap -> String
 displayMap (GameMap (MapSize xb yb) mp) =
     concat (map (\x -> (concat x) ++ "\n") mp)
+
+countSnakeBits :: Snake -> Int
+countSnakeBits (Snake _ sb) = length sb
 
 directionFromInput :: String -> Direction -> Direction
 directionFromInput "w" _ = N
