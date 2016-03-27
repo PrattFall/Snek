@@ -59,17 +59,18 @@ snakeAteSelf (Snake dir (sHead:sTail)) =
 
 createCell :: Int -> Int -> [SnakeBit] -> Food -> Cell
 createCell x y sb fd
-    | elem (Point x y) sb = "S"
-    | (Point x y) == fd            = "F"
-    | otherwise                    = "."
+    | elem (Point x y) sb  = "S"
+    | (Point x y) == fd    = "F"
+    | otherwise            = "."
 
 createMapRow :: Int -> Int -> [SnakeBit] -> Food -> MapRow
 createMapRow xb y sb fd =
-    [ createCell x y sb fd | x <- [0..(xb-1)]]
+    [createCell x y sb fd | x <- [0..(xb-1)]]
 
 createMap :: MapSize -> Snake -> Food -> GameMap
 createMap (MapSize xb yb) (Snake _ sb) fd =
-    (GameMap (MapSize xb yb) [createMapRow xb y sb fd | y <- [0..(yb-1)]])
+    (GameMap (MapSize xb yb) row)
+    where row = [createMapRow xb y sb fd | y <- [0..(yb-1)]]
 
 displayMap :: GameMap -> String
 displayMap (GameMap (MapSize xb yb) mp) =
@@ -78,9 +79,9 @@ displayMap (GameMap (MapSize xb yb) mp) =
 countSnakeBits :: Snake -> Int
 countSnakeBits (Snake _ sb) = length sb
 
-directionFromInput :: String -> Direction -> Direction
-directionFromInput "w" _ = N
-directionFromInput "s" _ = S
-directionFromInput "a" _ = W
-directionFromInput "d" _ = E
+directionFromInput :: Char -> Direction -> Direction
+directionFromInput 'w' _ = N
+directionFromInput 's' _ = S
+directionFromInput 'a' _ = W
+directionFromInput 'd' _ = E
 directionFromInput _ dir = dir

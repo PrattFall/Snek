@@ -19,7 +19,7 @@ main = do
 
 gameLoop :: MapSize -> Snake -> Food -> IO ()
 gameLoop ms sn fd = do
-    inp <- getLine
+    inp <- getChar
     gen <- newStdGen
 
     let (Snake sDir sb) = sn
@@ -41,6 +41,8 @@ gameLoop ms sn fd = do
     let gm = (createMap ms movedSnek newFood)
 
     let lostGame = (snakeAteSelf movedSnek)
+
+    putStrLn ""
 
     if lostGame
         then (lostMode movedSnek)
