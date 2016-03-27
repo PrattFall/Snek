@@ -40,11 +40,9 @@ gameLoop ms sn fd = do
 
     let gm = (createMap ms movedSnek newFood)
 
-    let lostGame = (snakeAteSelf movedSnek)
-
     putStrLn ""
 
-    if lostGame
+    if (snakeAteSelf movedSnek)
         then (lostMode movedSnek)
         else (putStrLn (displayMap gm))
 
