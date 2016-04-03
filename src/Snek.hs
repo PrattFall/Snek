@@ -14,6 +14,7 @@ module Snek
 , displayMap
 , directionFromInput
 , countSnakeBits
+, isInBounds
 ) where
 
 data Point = Point Int Int deriving (Eq, Show)
@@ -59,9 +60,9 @@ snakeAteSelf (Snake dir (sHead:sTail)) =
 
 createCell :: Int -> Int -> [SnakeBit] -> Food -> Cell
 createCell x y sb fd
-    | (Point x y) `elem` sb  = "S"
-    | (Point x y) == fd    = "F"
-    | otherwise            = "."
+    | (Point x y) `elem` sb = "S"
+    | (Point x y) == fd     = "F"
+    | otherwise             = "."
 
 createMapRow :: Int -> Int -> [SnakeBit] -> Food -> MapRow
 createMapRow xb y sb fd =
@@ -85,3 +86,7 @@ directionFromInput 's' _ = S
 directionFromInput 'a' _ = W
 directionFromInput 'd' _ = E
 directionFromInput _ dir = dir
+
+isInBounds :: Snake -> MapSize -> Bool
+isInBounds (Snake _ ((Point x y):_)) (MapSize xb yb) =
+    (x >= 0 && y >= 0 && x < xb && y < yb)

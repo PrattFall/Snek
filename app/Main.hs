@@ -42,15 +42,11 @@ gameLoop ms sn fd = do
 
     putStrLn ""
 
-    if ((snakeAteSelf movedSnek) || ((checkInBounds movedSnek ms) /= True))
+    if ((snakeAteSelf movedSnek) || (not (isInBounds movedSnek ms)))
         then (lostMode movedSnek)
         else (putStrLn $ displayMap gm)
 
     gameLoop ms movedSnek newFood
-
-checkInBounds :: Snake -> MapSize -> Bool
-checkInBounds (Snake _ ((Point x y):_)) (MapSize xb yb) =
-    (x >= 0 && y >= 0 && x < xb && y < yb)
 
 lostMode :: Snake -> IO ()
 lostMode sn = do
