@@ -42,15 +42,19 @@ gameLoop ms sn fd = do
 
     putStrLn ""
 
-    if (snakeAteSelf movedSnek)
+    if ((snakeAteSelf movedSnek) || ((checkInBounds movedSnek ms) /= True))
         then (lostMode movedSnek)
-        else (putStrLn (displayMap gm))
+        else (putStrLn $ displayMap gm)
 
     gameLoop ms movedSnek newFood
 
+checkInBounds :: Snake -> MapSize -> Bool
+checkInBounds (Snake _ ((Point x y):_)) (MapSize xb yb) =
+    (x >= 0 && y >= 0 && x < xb && y < yb)
+
 lostMode :: Snake -> IO ()
 lostMode sn = do
-    let numSB = (show (countSnakeBits sn))
+    let numSB = (show $ countSnakeBits sn)
     putStrLn "Snek is Dead."
     putStrLn ("You ended up with " ++ numSB ++ " points!")
     putStrLn "Press any key to start over."

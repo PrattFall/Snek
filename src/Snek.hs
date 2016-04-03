@@ -55,11 +55,11 @@ snakeAteSelf (Snake dir (sHead:sTail)) =
     if overlap
         then True
         else (snakeAteSelf (Snake dir sTail))
-    where overlap = elem sHead sTail
+    where overlap = sHead `elem` sTail
 
 createCell :: Int -> Int -> [SnakeBit] -> Food -> Cell
 createCell x y sb fd
-    | elem (Point x y) sb  = "S"
+    | (Point x y) `elem` sb  = "S"
     | (Point x y) == fd    = "F"
     | otherwise            = "."
 
