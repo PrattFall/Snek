@@ -43,8 +43,8 @@ gameLoop ms sn fd = do
     putStrLn ""
 
     if ((snakeAteSelf movedSnek) || (not (isInBounds movedSnek ms)))
-        then (lostMode movedSnek)
-        else (putStrLn $ displayMap gm)
+        then lostMode $ movedSnek
+        else putStrLn $ displayMap gm
 
     gameLoop ms movedSnek newFood
 

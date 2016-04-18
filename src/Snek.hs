@@ -70,7 +70,7 @@ createMapRow xb y sb fd =
 
 createMap :: MapSize -> Snake -> Food -> GameMap
 createMap (MapSize xb yb) (Snake _ sb) fd =
-    (GameMap (MapSize xb yb) row)
+    GameMap (MapSize xb yb) row
     where row = [createMapRow xb y sb fd | y <- [0..(yb-1)]]
 
 displayMap :: GameMap -> String
@@ -85,6 +85,11 @@ directionFromInput 'w' _ = N
 directionFromInput 's' _ = S
 directionFromInput 'a' _ = W
 directionFromInput 'd' _ = E
+-- Vim keybinds :)
+directionFromInput 'k' _ = N
+directionFromInput 'j' _ = S
+directionFromInput 'h' _ = W
+directionFromInput 'l' _ = E
 directionFromInput _ dir = dir
 
 isInBounds :: Snake -> MapSize -> Bool
