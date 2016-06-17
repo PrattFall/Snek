@@ -11,7 +11,7 @@ main = do
 
     let ms = MapSize 16 8
 
-    let snek = (Snake E [(Point 8 4)])
+    let snek = Snake E [Point 8 4]
 
     let fud = getRandomNonSnakePoint gen ms snek
 
@@ -24,33 +24,33 @@ gameLoop ms sn fd = do
 
     let (Snake sDir sb) = sn
 
-    let dir = (directionFromInput inp sDir)
+    let dir = directionFromInput inp sDir
 
     let turnedSnake = turnSnake sn dir
 
-    let snakeAteFood = (elem fd sb)
+    let snakeAteFood = fd `elem` sb
 
     let movedSnek = if snakeAteFood
-        then (addSnakeBit turnedSnake)
-        else (moveSnake turnedSnake)
+        then addSnakeBit turnedSnake
+        else moveSnake turnedSnake
 
     let newFood = if snakeAteFood
         then getRandomNonSnakePoint gen ms movedSnek
         else fd
 
-    let gm = (createMap ms movedSnek newFood)
+    let gm = createMap ms movedSnek newFood
 
     putStrLn ""
 
-    if ((snakeAteSelf movedSnek) || (not (isInBounds movedSnek ms)))
-        then lostMode $ movedSnek
+    if snakeAteSelf movedSnek || not (isInBounds movedSnek ms)
+        then lostMode movedSnek
         else putStrLn $ displayMap gm
 
     gameLoop ms movedSnek newFood
 
 lostMode :: Snake -> IO ()
 lostMode sn = do
-    let numSB = (show $ countSnakeBits sn)
+    let numSB = show $ countSnakeBits sn
     putStrLn "Snek is Dead."
     putStrLn ("You ended up with " ++ numSB ++ " points!")
     putStrLn "Press any key to start over."
@@ -58,9 +58,9 @@ lostMode sn = do
 
 getRandomNonSnakePoint :: StdGen -> MapSize -> Snake -> Point
 getRandomNonSnakePoint g (MapSize xb yb) (Snake dir sb)
-    | elem pt sb =
+    | pt `elem` sb =
         getRandomNonSnakePoint tG (MapSize xb yb) (Snake dir sb)
     | otherwise = pt
-    where (x, sG) = randomR (0, (xb-1)) g
-          (y, tG) = randomR (0, (yb-1)) sG
-          pt = (Point x y)
+    where (x, sG) = randomR (0, xb-1) g
+          (y, tG) = randomR (0, yb-1) sG
+          pt = Point x y

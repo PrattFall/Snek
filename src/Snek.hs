@@ -37,32 +37,30 @@ moveBit (Point x y) dir =
                 W -> Point (x-1) y
 
 newHead :: Snake -> SnakeBit
-newHead (Snake dir s) = (moveBit (head s) dir)
+newHead (Snake dir s) = moveBit (head s) dir
 
 addSnakeBit :: Snake -> Snake
 addSnakeBit (Snake dir sb) =
-    Snake dir ((newHead (Snake dir sb)):sb)
+    Snake dir (newHead (Snake dir sb):sb)
 
 turnSnake :: Snake -> Direction -> Snake
-turnSnake (Snake _ sb) dir = (Snake dir sb)
+turnSnake (Snake _ sb) dir = Snake dir sb
 
 moveSnake :: Snake -> Snake
 moveSnake (Snake dir sb) =
-    Snake dir ((newHead (Snake dir sb)):(init sb))
+    Snake dir (newHead (Snake dir sb):init sb)
 
 snakeAteSelf :: Snake -> Bool
 snakeAteSelf (Snake _ []) = False
 snakeAteSelf (Snake dir (sHead:sTail)) =
-    if overlap
-        then True
-        else (snakeAteSelf (Snake dir sTail))
+    overlap || snakeAteSelf (Snake dir sTail)
     where overlap = sHead `elem` sTail
 
 createCell :: Int -> Int -> [SnakeBit] -> Food -> Cell
 createCell x y sb fd
-    | (Point x y) `elem` sb = "S"
-    | (Point x y) == fd     = "F"
-    | otherwise             = "."
+    | Point x y `elem` sb = "S"
+    | Point x y == fd     = "F"
+    | otherwise           = "."
 
 createMapRow :: Int -> Int -> [SnakeBit] -> Food -> MapRow
 createMapRow xb y sb fd =
@@ -75,7 +73,7 @@ createMap (MapSize xb yb) (Snake _ sb) fd =
 
 displayMap :: GameMap -> String
 displayMap (GameMap (MapSize xb yb) mp) =
-    concat (map (\x -> (concat x) ++ "\n") mp)
+    concatMap (\x -> concat x ++ "\n") mp
 
 countSnakeBits :: Snake -> Int
 countSnakeBits (Snake _ sb) = length sb
@@ -93,5 +91,5 @@ directionFromInput 'l' _ = E
 directionFromInput _ dir = dir
 
 isInBounds :: Snake -> MapSize -> Bool
-isInBounds (Snake _ ((Point x y):_)) (MapSize xb yb) =
-    (x >= 0 && y >= 0 && x < xb && y < yb)
+isInBounds (Snake _ (Point x y:_)) (MapSize xb yb) =
+    x >= 0 && y >= 0 && x < xb && y < yb
